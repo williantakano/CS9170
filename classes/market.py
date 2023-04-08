@@ -31,40 +31,26 @@ class Market(object):
 
         return encoder, model_poisson
 
-    def prices_competitor1(self, n_weeks):
-        return np.full(shape=n_weeks, fill_value=self.price_mean)
-
-    def prices_competitor2(self, n_weeks):
-        # np.random.seed(0)
-        # prices = np.random.normal(loc=self.price_mean, scale=self.price_std, size=n_weeks).astype(int)
-        # prices = np.clip(prices, a_min=self.price_min, a_max=self.price_max)
-
-        return np.random.randint(low=self.price_min, high=self.price_max, size=n_weeks)
+    @staticmethod
+    def price_market(price_agent, price_competitor):
+        return (price_agent + price_competitor) / 2
 
     @staticmethod
-    def get_prices(range_actions, action, prices_competitor, week):
-        price_company = range_actions[action]
-        price_competitor = prices_competitor[week]
-        price_market = (price_company + price_competitor) / 2
-
-        return price_company, price_competitor, price_market
-
-    @staticmethod
-    def get_sales(encoder, model_poisson, price_market, price_company, price_competitor, week):
-        # Market sales = competitor sales + company sales
-        # Company price x company sales = competitor price x competitor sales
+    def get_sales(price_market, price_agent, price_competitor, encoder, model_poisson, week):
+        # Market sales = competitor sales + agent sales
+        # Agent price x agent sales = competitor price x competitor sales
         X_price_market = np.array([[price_market]])
         X_week_of_year = encoder.transform(pd.DataFrame(data={'week_of_year': [str(week)]})).values
         X = np.concatenate((X_price_market, X_week_of_year), axis=1)
 
         sales_market = int(model_poisson.predict(X))
-        sales_company = math.ceil(sales_market / (1 + (price_company / price_competitor)))
-        sales_competitor = math.floor(sales_market / (1 + (price_competitor / price_company)))
+        sales_agent = math.ceil(sales_market / (1 + (price_agent / price_competitor)))
+        sales_competitor = math.floor(sales_market / (1 + (price_competitor / price_agent)))
 
-        return sales_market, sales_company, sales_competitor
+        return sales_market, sales_agent, sales_competitor
 
-    def get_profits(self, sales_company, sales_competitor, price_company, price_competitor):
-        profit_company = sales_company * (price_company - self.cost_production)
+    def get_profits(self, sales_agent, sales_competitor, price_agent, price_competitor):
+        profit_agent = sales_agent * (price_agent - self.cost_production)
         profit_competitor = sales_competitor * (price_competitor - self.cost_production)
 
-        return profit_company, profit_competitor
+        return profit_agent, profit_competitor

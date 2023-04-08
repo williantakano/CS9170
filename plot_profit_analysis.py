@@ -1,18 +1,14 @@
 import os
-import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 
-competitors = ['type_1', 'type_2']
-models = ['q_learning', 'dqn']
-dict_range_products = {'men_street_footwear': np.arange(start=0, stop=4.5 * 10 ** 6, step=0.5 * 10 ** 6),
-                       'men_athletic_footwear': np.arange(start=0, stop=3 * 10 ** 6, step=0.5 * 10 ** 6),
-                       'men_apparel': np.arange(start=0, stop=2.5 * 10 ** 6, step=0.5 * 10 ** 6),
-                       'women_street_footwear': np.arange(start=0, stop=2.5 * 10 ** 6, step=0.5 * 10 ** 6),
-                       'women_athletic_footwear': np.arange(start=0, stop=2.5 * 10 ** 6, step=0.5 * 10 ** 6),
-                       'women_apparel': np.arange(start=0, stop=3.5 * 10 ** 6, step=0.5 * 10 ** 6)}
+product = 'men_street_footwear'
+competitors = ['type_1', 'type_2', 'type_3']
+models = ['q_learning']
+dict_color = {'agent': '#1f77b4',
+              'competitor': '#ff7f0e'}
 
 figsize = (11, 4)
 font_size_axis = 11
@@ -30,31 +26,24 @@ def profit_per_episode(epsilon_index, competitor, result_company, result_competi
     profit_competitor_mean = np.mean(profit_competitor, axis=0)
     profit_competitor_std = np.std(profit_competitor, axis=0)
 
-    ax.plot(profit_company_mean, label='Agent', color='b')
+    ax.plot(profit_company_mean, label='Agent', color=dict_color['agent'])
     ax.fill_between(range(len(profit_company_mean)),
                     profit_company_mean - profit_company_std,
                     profit_company_mean + profit_company_std,
-                    color='b', alpha=0.3)
-    ax.plot(profit_competitor_mean, label='Competitor {}'.format(competitor.split('_')[1]), color='g')
+                    color=dict_color['agent'], alpha=0.3)
+    ax.plot(profit_competitor_mean, label='Competitor {}'.format(competitor.split('_')[1]), color=dict_color['competitor'])
     ax.fill_between(range(len(profit_competitor_mean)),
                     profit_competitor_mean - profit_competitor_std,
                     profit_competitor_mean + profit_competitor_std,
-                    color='g', alpha=0.3)
+                    color=dict_color['competitor'], alpha=0.3)
 
     return
 
 
-def main(product):
-    # Create folder
-    folder = os.path.join('plots', product, 'profit_analysis')
-    if os.path.exists(folder):
-        shutil.rmtree(folder)
-
-    os.makedirs(folder)
-
+def main():
     for model in models:
         for competitor in competitors:
-            results = np.load(os.path.join('results', product, model, '{}_{}.npz'.format(model, competitor)))
+            results = np.load(os.path.join('results', '{}_{}.npz'.format(model, competitor)))
             result_company = results['arr_0']
             result_competitor = results['arr_1']
 
@@ -70,7 +59,7 @@ def main(product):
             profit_per_episode(epsilon_index=1, competitor=competitor, result_company=result_company, result_competitor=result_competitor, ax=ax1)
             profit_per_episode(epsilon_index=2, competitor=competitor, result_company=result_company, result_competitor=result_competitor, ax=ax2)
 
-            ax0.yaxis.set_ticks(dict_range_products[product])
+            ax0.yaxis.set_ticks(np.arange(start=0, stop=4.5 * 10 ** 6, step=0.5 * 10 ** 6))
 
             ax0.set_ylabel('Reward', fontsize=font_size_axis)
 
@@ -90,10 +79,9 @@ def main(product):
             ax2.tick_params(labelleft=False)
 
             plt.legend(loc='lower right', fancybox=True)
-            plt.savefig(os.path.join(folder, '{}_{}.png'.format(model, competitor)), bbox_inches='tight', format='png', dpi=300)
+            plt.savefig(os.path.join('plots', '{}_{}.png'.format(model, competitor)), bbox_inches='tight', format='png', dpi=300)
             plt.close()
 
 
 if __name__ == '__main__':
-    for product in dict_range_products.keys():
-        main(product=product)
+    main()

@@ -1,14 +1,11 @@
 import os
-import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 
-products = ['men_street_footwear', 'men_athletic_footwear', 'men_apparel', 'women_street_footwear',
-            'women_athletic_footwear', 'women_apparel']
+product = 'men_street_footwear'
 
 font_size_axis = 11
 font_size_tick = 10
-font_size_title = 12
 
 
 def price_x_sales(df_product, folder):
@@ -28,7 +25,6 @@ def price_x_sales(df_product, folder):
     ax1.tick_params(axis='both', which='major', labelsize=font_size_tick)
     ax1.set_xticks(df_product['date'].values[::12])
     ax1.set_xticklabels(df_product['date'].values[::12], rotation=30)
-    ax1.set_title('Sales versus price', size=font_size_title)
 
     ax2.set_ylabel('Units sold per week ($10^3$)', size=font_size_axis)
     ax2.tick_params(axis='both', which='major', labelsize=font_size_tick)
@@ -44,14 +40,13 @@ def price_x_sales(df_product, folder):
     return
 
 
-def price_histogram(df_product):
+def price_histogram(df_product, folder):
     fig, ax = plt.subplots(figsize=(5, 4))
 
     ax.hist(df_product['price_unit'], bins=20, ec='black')
 
-    ax.set_xlabel('Price (R$)', size=font_size_axis)
+    ax.set_xlabel('Price per unit (R$)', size=font_size_axis)
     ax.set_ylabel('Count', size=font_size_axis)
-    ax.set_title('Histogram Prices per Unit', size=font_size_title)
     ax.tick_params(axis='both', which='major', labelsize=font_size_tick)
     ax.spines[['right', 'top']].set_visible(False)
 
@@ -62,14 +57,13 @@ def price_histogram(df_product):
     return
 
 
-def sales_histogram(df_product):
+def sales_histogram(df_product, folder):
     fig, ax = plt.subplots(figsize=(5, 4))
 
     ax.hist(df_product['units_sold'], bins=15, ec='black')
 
     ax.set_xlabel('Units sold per week', size=font_size_axis)
     ax.set_ylabel('Count', size=font_size_axis)
-    ax.set_title('Histogram Sales', size=font_size_title)
     ax.tick_params(axis='both', which='major', labelsize=font_size_tick)
     ax.spines[['right', 'top']].set_visible(False)
 
@@ -80,16 +74,10 @@ def sales_histogram(df_product):
     return
 
 
-for product in products:
-    # Create folder
-    folder = os.path.join('plots', product, 'dataset')
-    if os.path.exists(folder):
-        shutil.rmtree(folder)
-
-    os.makedirs(folder)
-
+if __name__ == "__main__":
+    folder = os.path.join('plots')
     df_product = pd.read_csv(os.path.join('dataset', '{}.csv'.format(product)), sep=';')
 
     price_x_sales(df_product=df_product, folder=folder)
-    price_histogram(df_product=df_product)
-    sales_histogram(df_product=df_product)
+    price_histogram(df_product=df_product, folder=folder)
+    sales_histogram(df_product=df_product, folder=folder)
