@@ -6,7 +6,7 @@ from matplotlib.gridspec import GridSpec
 
 product = 'men_street_footwear'
 competitors = ['type_1', 'type_2', 'type_3']
-models = ['q_learning']
+models = ['q_learning', 'dqn']
 dict_color = {'agent': '#1f77b4',
               'competitor': '#ff7f0e'}
 
@@ -59,7 +59,7 @@ def main():
             profit_per_episode(epsilon_index=1, competitor=competitor, result_company=result_company, result_competitor=result_competitor, ax=ax1)
             profit_per_episode(epsilon_index=2, competitor=competitor, result_company=result_company, result_competitor=result_competitor, ax=ax2)
 
-            ax0.yaxis.set_ticks(np.arange(start=0, stop=4.5 * 10 ** 6, step=0.5 * 10 ** 6))
+            ax0.yaxis.set_ticks(np.arange(start=0, stop=5.5 * 10 ** 6, step=1 * 10 ** 6))
 
             ax0.set_ylabel('Reward', fontsize=font_size_axis)
 
@@ -74,6 +74,10 @@ def main():
             ax0.spines[['right', 'top']].set_visible(False)
             ax1.spines[['right', 'top']].set_visible(False)
             ax2.spines[['right', 'top']].set_visible(False)
+
+            ax0.grid(axis='y')
+            ax1.grid(axis='y')
+            ax2.grid(axis='y')
 
             ax1.tick_params(labelleft=False)
             ax2.tick_params(labelleft=False)

@@ -45,7 +45,6 @@ def price_histogram(df_product, folder):
 
     ax.hist(df_product['price_unit'], bins=20, ec='black')
 
-    ax.set_xlabel('Price per unit (R$)', size=font_size_axis)
     ax.set_ylabel('Count', size=font_size_axis)
     ax.tick_params(axis='both', which='major', labelsize=font_size_tick)
     ax.spines[['right', 'top']].set_visible(False)
@@ -62,7 +61,6 @@ def sales_histogram(df_product, folder):
 
     ax.hist(df_product['units_sold'], bins=15, ec='black')
 
-    ax.set_xlabel('Units sold per week', size=font_size_axis)
     ax.set_ylabel('Count', size=font_size_axis)
     ax.tick_params(axis='both', which='major', labelsize=font_size_tick)
     ax.spines[['right', 'top']].set_visible(False)
